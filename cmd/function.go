@@ -19,18 +19,6 @@ var secretsClient coreV1Types.SecretInterface
 var ctx context.Context
 type Secret map[string]interface{}
 
-func CheckInput() {
-	fi, err := os.Stdin.Stat()
-	if err != nil {
-	  panic(err)
-	}
-	if fi.Size() > 0 {
-		return 
-	}
-	fmt.Println("Check ks help or use ks -h command")
-	os.Exit(1)
-}
-
 func FlagCheck(cmd *cobra.Command, args []string) {
 		bytes := ReadInputs()
 		bools,_ := cmd.Flags().GetBool("reverse")
@@ -109,10 +97,10 @@ func AddAndUpdate(cmd *cobra.Command, args []string) {
 }
 
 func ReadInputs() []byte {
-	CheckInput()
-	bytes, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return bytes
+		bytes, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			fmt.Println(err)
+			return nil
+		}
+		return bytes
 }
