@@ -22,27 +22,16 @@ func Execute() error {
 }
 
 func init() {
-	rootCmd.PersistentFlags().BoolP("reverse","r", false, "String to base64 value")
-	rootCmd.AddCommand(addCmd)
-	rootCmd.AddCommand(updateCmd)
+	rootCmd.Flags().BoolP("reverse","r", false, "String to base64 value")
+	rootCmd.AddCommand(modifyCmd)
 }
 
-var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Update Kubernetes Secret",
+var modifyCmd = &cobra.Command{
+	Use:   "modify",
+	Short: "Kubernetes Secrets Add/Update value ",
 	Run: AddAndUpdate,
-	Example: `Update Secret:
-kubetcl get secrets <Secret Name> -n <Namespace> -o yaml | ks update key:value 
-Update Multiple Secret:
-kubetcl get secrets <Secret Name> -n <Namespace> -o yaml | ks update key1:value1 key2:value2
-	`,
-}
-var addCmd = &cobra.Command{
-	Use:   "add",
-	Short: "Kubernetes Secrets Add value ",
-	Run: AddAndUpdate,
-	Example: `Add Secret:
-kubetcl get secrets <Secret Name> -n <Namespace> -o yaml | ks add key:value 
-Add Multiple Secret:
-kubetcl get secrets <Secret Name> -n <Namespace> -o yaml | ks add key1:value1 key2:value2`,
+	Example: `Add/Update Secret:
+kubetcl get secrets <Secret Name> -n <Namespace> -o yaml | ks modify key:value 
+Add/Update Multiple Secret:
+kubetcl get secrets <Secret Name> -n <Namespace> -o yaml | ks modify key1:value1 key2:value2`,
 }
