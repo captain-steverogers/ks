@@ -40,11 +40,32 @@ func SecretsConvert(bytes []byte) string{
 
 func SecretsGet(bytes []byte) {
 	var spec Secret
-	var m interface{}
 	err := yaml.Unmarshal(bytes, &spec)
 	if err != nil {
 	  panic(err.Error())
-	}	
+	}
+	if spec["kind"] == "Secret" {
+		UnmarshalYaml(spec)
+		s,err := yaml.Marshal(spec)
+		if err != nil {
+			panic(err.Error())
+		}
+		fmt.Printf("%s\n",s)
+	} else if spec["kind"] == "List" {
+		m := spec["items"].([]interface{})
+		for v, _ := range m {
+			UnmarshalYaml(m[v].(map[string]interface{}))
+		}
+		s,err := yaml.Marshal(spec)
+		if err != nil {
+			panic(err.Error())
+		}
+		fmt.Printf("%s\n",s)
+	}
+}
+
+func UnmarshalYaml(spec Secret) {
+	var m interface{}
 	m = spec["data"]
 	Mapkeys := m.(map[string]interface{})
 	for k,v := range Mapkeys {
@@ -52,8 +73,6 @@ func SecretsGet(bytes []byte) {
 		data,_:= b64.StdEncoding.DecodeString(value)
 		Mapkeys[k] = string(data)
 	}
-	s,err := yaml.Marshal(spec)
-	fmt.Printf("%s\n",s)
 }
 
 func UpdateSecrets(spec v1.Secret) *v1.Secret {
@@ -96,6 +115,24 @@ func AddAndUpdate(cmd *cobra.Command, args []string) {
 		}
 		initClient(spec.Namespace)
 		UpdateSecrets(spec)
+}
+
+func DeleteValueFromSecret(cmd *cobra.Command, args []string) {
+	bytes := ReadInputs()
+	var spec v1.Secret
+	err := yaml.Unmarshal(bytes, &spec)
+	if err != nil {
+	  panic(err.Error())
+	}
+	if spec.Data == nil {
+		spec.Data = map[string][]byte{}
+	}
+	for _,s := range args {
+		// args := strings.Split(s,":")
+		delete(spec.Data,s)
+	}
+	initClient(spec.Namespace)
+	UpdateSecrets(spec)
 }
 
 func ReadInputs() []byte {
