@@ -14,7 +14,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	coreV1Types "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/clientcmd"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
+
 )
 var secretsClient coreV1Types.SecretInterface
 var ctx context.Context
